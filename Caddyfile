@@ -1,0 +1,12 @@
+# Servidor est\u00e1tico m\u00ednimo para Railway.
+{
+  admin off
+  auto_https off
+}
+
+:{$PORT:8080} {
+  root * .
+  encode gzip
+  file_server
+  try_files {path} /index.html
+}
