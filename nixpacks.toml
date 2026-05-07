@@ -1,5 +1,0 @@
-# Nixpacks config para Railway servir o site est\u00e1tico.
-providers = ["staticfile"]
-
-[start]
-cmd = "caddy file-server --listen :$PORT --root ."
