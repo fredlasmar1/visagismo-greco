@@ -192,6 +192,42 @@ footer { text-align:center; padding:36px; border-top:1px solid rgba(255,255,255,
   .dt-head,.dt-row { padding:12px 14px; }
   .cuts-grid { grid-template-columns:1fr; }
 }
+
+/* CTA AGENDAR (no fim do resultado) */
+.book-cta {
+  background:linear-gradient(135deg,rgba(201,168,76,.16),rgba(201,168,76,.04));
+  border:1px solid rgba(201,168,76,.35); padding:30px 26px; margin-top:36px;
+  text-align:center;
+}
+.book-cta h3 { font-family:'Playfair Display',serif; font-size:24px; font-weight:700; margin-bottom:8px; }
+.book-cta h3 em { font-style:italic; color:var(--gold); }
+.book-cta p { font-size:13px; color:rgba(255,255,255,.6); font-weight:300; line-height:1.7; max-width:380px; margin:0 auto 20px; }
+.book-cta .cta-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.btn-book { background:var(--gold); border:none; color:var(--black); font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:3px; text-transform:uppercase; padding:15px 28px; cursor:pointer; transition:background .3s; }
+.btn-book:hover { background:var(--gold-light); }
+.btn-skip { background:transparent; border:1px solid rgba(255,255,255,.12); color:var(--gray); font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; padding:14px 22px; cursor:pointer; transition:all .3s; }
+.btn-skip:hover { border-color:rgba(201,168,76,.3); color:var(--gold); }
+
+/* MODAL LEAD */
+#leadModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); backdrop-filter:blur(6px); z-index:400; align-items:center; justify-content:center; padding:20px; }
+#leadModal.active { display:flex; animation:fadeUp .3s ease both; }
+.lead-card { background:var(--dark2); border:1px solid rgba(201,168,76,.3); max-width:420px; width:100%; padding:32px 26px; position:relative; }
+.lead-card h3 { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; margin-bottom:6px; }
+.lead-card .lead-sub { font-size:13px; color:var(--gray); font-weight:300; line-height:1.6; margin-bottom:22px; }
+.lead-field { margin-bottom:14px; }
+.lead-field label { display:block; font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--gray); margin-bottom:6px; }
+.lead-field input { width:100%; background:var(--dark3); border:1px solid rgba(255,255,255,.08); color:#fff; font-family:'Barlow',sans-serif; font-size:15px; padding:13px 14px; transition:border-color .2s; }
+.lead-field input:focus { outline:none; border-color:var(--gold); }
+.lead-actions { display:flex; gap:10px; margin-top:20px; }
+.btn-submit-lead { flex:1; background:var(--gold); border:none; color:var(--black); font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:3px; text-transform:uppercase; padding:15px; cursor:pointer; }
+.btn-submit-lead:hover { background:var(--gold-light); }
+.btn-submit-lead:disabled { opacity:.5; cursor:not-allowed; }
+.btn-close-lead { background:transparent; border:1px solid rgba(255,255,255,.12); color:var(--gray); font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; padding:14px 18px; cursor:pointer; }
+.lead-error { font-size:12px; color:#e07070; margin-top:10px; min-height:16px; }
+.lead-success { text-align:center; padding:20px 0; }
+.lead-success .check { width:54px; height:54px; border:1px solid var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--gold); font-size:26px; }
+.lead-success h4 { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; margin-bottom:8px; }
+.lead-success p { font-size:13px; color:var(--gray); font-weight:300; line-height:1.6; max-width:320px; margin:0 auto; }
 </style>
 </head>
 <body>
@@ -294,6 +330,15 @@ footer { text-align:center; padding:36px; border-top:1px solid rgba(255,255,255,
     <div class="dt-row"><div class="dt-qty">5+ serviços</div><div class="dt-pct">20%</div><div class="dt-tag"><span class="dt-badge">🏆 Máximo</span></div></div>
   </div>
 
+  <div class="book-cta" id="bookCta" style="display:none">
+    <h3>Quer agendar com um <em>barbeiro Greco</em>?</h3>
+    <p>Deixe seu nome e WhatsApp — entramos em contato para reservar seu horário com o corte ideal.</p>
+    <div class="cta-actions">
+      <button class="btn-book" onclick="openLeadModal()">Quero agendar</button>
+      <button class="btn-skip" onclick="hideBookingCTA()">Agora não</button>
+    </div>
+  </div>
+
   <div class="share-section">
     <div class="share-hint">Compartilhe sua análise</div>
     <button class="btn-wpp" onclick="shareWpp()">
@@ -304,12 +349,63 @@ footer { text-align:center; padding:36px; border-top:1px solid rgba(255,255,255,
   </div>
 </div>
 
+<div id="leadModal">
+  <div class="lead-card">
+    <div id="leadForm">
+      <h3>Reservar meu horário</h3>
+      <p class="lead-sub">Nossa equipe entra em contato pelo WhatsApp para confirmar dia e horário.</p>
+      <div class="lead-field">
+        <label for="leadName">Seu nome</label>
+        <input type="text" id="leadName" placeholder="Como podemos te chamar?" autocomplete="name">
+      </div>
+      <div class="lead-field">
+        <label for="leadPhone">WhatsApp</label>
+        <input type="tel" id="leadPhone" placeholder="(62) 9 9999-9999" autocomplete="tel">
+      </div>
+      <div class="lead-error" id="leadError"></div>
+      <div class="lead-actions">
+        <button class="btn-submit-lead" id="leadSubmit" onclick="submitLead()">Confirmar</button>
+        <button class="btn-close-lead" onclick="closeLeadModal()">Fechar</button>
+      </div>
+    </div>
+    <div id="leadDone" class="lead-success" style="display:none">
+      <div class="check">✓</div>
+      <h4>Recebemos seu contato</h4>
+      <p>Em breve um atendente da Greco entra em contato pelo WhatsApp para confirmar seu horário.</p>
+      <div class="lead-actions" style="justify-content:center; margin-top:18px">
+        <button class="btn-close-lead" onclick="closeLeadModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer><div class="footer-logo">Greco Barbearia</div></footer>
 
 <script>
-const FAL_KEY = 'd7934616-5e43-4905-896c-da5b595807c1:9feffc009fad0600bc8f649b6b70822f';
+// ── CONFIG ──
+// Endpoint do Greco Metas (backend Visagismo). Pode ser sobrescrito via
+// window.VISAGISMO_API_BASE antes do carregamento desse script.
+const API_BASE = (window.VISAGISMO_API_BASE || 'https://www.grecopro.com.br') + '/api/visagismo';
+const PUBLIC_TOKEN = window.VISAGISMO_PUBLIC_TOKEN || ''; // opcional, se backend exigir
 
-let photoBase64 = null, photoMime = 'image/jpeg', analysisData = null, camStream = null;
+// ── UTM TRACKING ──
+const UTM_KEYS = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','ref'];
+const utm = (() => {
+  const out = {};
+  const qs = new URLSearchParams(window.location.search);
+  UTM_KEYS.forEach(k => { const v = qs.get(k); if (v) out[k] = v; });
+  // Persiste a primeira origem em localStorage
+  try {
+    const saved = JSON.parse(localStorage.getItem('greco_visagismo_utm') || '{}');
+    if (Object.keys(out).length === 0 && Object.keys(saved).length > 0) return saved;
+    if (Object.keys(out).length > 0) localStorage.setItem('greco_visagismo_utm', JSON.stringify(out));
+  } catch (_) {}
+  return out;
+})();
+
+let photoBase64 = null, photoMime = 'image/jpeg', analysisData = null, sessionUuid = null, camStream = null;
+const imageStatus = {}; // idx -> 'pending'|'done'|'error'
+let pollTimer = null;
 
 // ── UPLOAD ──
 const uploadZone = document.getElementById('uploadZone');
@@ -378,17 +474,19 @@ async function startAnalysis() {
 
   try {
     setLoading(true, 'Identificando o formato do seu rosto e os melhores cortes…');
-    const analysis = await runVisagismo();
-    analysisData = analysis;
+    const result = await analyzeFace();
+    sessionUuid = result.sessionUuid;
+    analysisData = result.analysis;
 
-    renderText(analysis);
+    renderText(analysisData);
     setLoading(false);
     document.getElementById('previewArea').style.display = 'none';
     document.getElementById('results').classList.add('active');
     document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
 
-    // Generate images progressively (non-blocking)
-    analysis.cortes.forEach((c, i) => generateImage(c, i));
+    // Backend já dispara a geração das imagens em background.
+    // Frontend faz polling do estado da sessão.
+    startImagePolling();
 
   } catch(err) {
     setLoading(false);
@@ -399,43 +497,34 @@ async function startAnalysis() {
   }
 }
 
-// ── CLAUDE ──
-async function runVisagismo() {
-  const system = `Você é especialista em visagismo masculino da Greco Barbearia, Anápolis-GO.
-Analise a foto do rosto do cliente. Retorne SOMENTE JSON válido sem texto fora:
-{
-  "formato": "Oval|Quadrado|Redondo|Triangular|Losango|Oblongo|Coração",
-  "subtitulo": "característica principal em frase curta",
-  "descricao": "2-3 frases sobre o formato e o que valorizar",
-  "cortes": [
-    {
-      "nome": "Nome do corte",
-      "descricao": "Por que combina com esse formato",
-      "prompt_en": "photorealistic portrait of a man, [describe the exact facial features visible in the photo in English: face shape, skin tone, beard style, age approx], wearing the [specific haircut name and technical description], professional barbershop, studio lighting, sharp focus, high quality photo, front facing"
-    }
-  ],
-  "evitar": "O que evitar e por quê em 1-2 frases",
-  "servico": "Serviço complementar premium",
-  "servico_desc": "Por que complementa o visual"
-}
-Inclua exatamente 3 cortes. O prompt_en deve descrever com precisão as características do rosto visto na foto.`;
+// ── BACKEND: Analisar rosto ──
+// Chama POST /api/visagismo/analyze (modo vitrine) no Greco Metas.
+// Retorna { sessionUuid, analysis: { formato, subtitulo, descricao, cortes[], evitar, servico, servico_desc } }
+async function analyzeFace() {
+  const headers = { 'Content-Type': 'application/json' };
+  if (PUBLIC_TOKEN) headers['x-visagismo-token'] = PUBLIC_TOKEN;
 
-  const resp = await fetch('https://greco-visagismo-api.fredlasmar.workers.dev/analyze', {
+  const resp = await fetch(API_BASE + '/analyze', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mime: photoMime, image: photoBase64 })
+    headers,
+    body: JSON.stringify({
+      mode: 'vitrine',
+      mime: photoMime,
+      image: photoBase64,
+      utm
+    })
   });
 
-  if (!resp.ok) throw new Error('Claude HTTP ' + resp.status);
+  if (!resp.ok) {
+    let detail = '';
+    try { detail = (await resp.json()).error || ''; } catch (_) {}
+    throw new Error('Falha ao analisar (' + resp.status + ')' + (detail ? ': ' + detail : ''));
+  }
   const data = await resp.json();
-  if (data.error) throw new Error('Claude: ' + (data.error.message || JSON.stringify(data.error)));
-  if (!data.content) throw new Error('Sem resposta: ' + JSON.stringify(data));
-  const raw = data.content.map(b => b.text || '').join('');
-  const start = raw.indexOf('{');
-  const end = raw.lastIndexOf('}');
-  if (start === -1 || end === -1) throw new Error('JSON não encontrado. Tente outra foto.');
-  try { return JSON.parse(raw.substring(start, end + 1)); }
-  catch(e) { throw new Error('Erro ao interpretar resposta. Tente outra foto.'); }
+  if (!data.analysis || !Array.isArray(data.analysis.cortes)) {
+    throw new Error('Resposta inválida do servidor. Tente outra foto.');
+  }
+  return data;
 }
 
 // ── RENDER ──
@@ -473,49 +562,156 @@ function renderText(r) {
   });
 }
 
-// ── FAL.AI ──
-async function generateImage(corte, idx) {
-  try {
-    // Submit
-    const sub = await fetch('https://greco-visagismo-api.fredlasmar.workers.dev/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: corte.prompt_en })
-    });
-    if (!sub.ok) throw new Error('fal submit ' + sub.status);
-    const { request_id } = await sub.json();
+// ── POLLING DE IMAGENS ──
+// O backend gera as imagens em background após POST /analyze.
+// Aqui nós fazemos polling de GET /session/:uuid e atualizamos cada card
+// quando a URL da imagem correspondente fica disponível.
+function startImagePolling() {
+  if (!sessionUuid || !analysisData) return;
+  const total = analysisData.cortes.length;
+  let tries = 0;
+  const MAX_TRIES = 50; // ~2,5min com intervalo 3s
 
-    // Poll
-    let url = null, tries = 0;
-    while (!url && tries < 40) {
-      await sleep(2500);
-      const poll = await fetch(`https://greco-visagismo-api.fredlasmar.workers.dev/poll/${request_id}`);
-      if (poll.ok) {
-        const d = await poll.json();
-        if (d.images?.[0]?.url) url = d.images[0].url;
-        else if (d.status === 'FAILED') throw new Error('Geração falhou');
+  const tick = async () => {
+    tries++;
+    try {
+      const resp = await fetch(API_BASE + '/session/' + encodeURIComponent(sessionUuid), {
+        headers: PUBLIC_TOKEN ? { 'x-visagismo-token': PUBLIC_TOKEN } : {}
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        const generated = data.generatedImages || data.session?.generatedImages || [];
+        generated.forEach((entry, i) => {
+          if (!entry || imageStatus[i] === 'done') return;
+          const url = typeof entry === 'string' ? entry : entry.url;
+          const failed = typeof entry === 'object' && entry && entry.error;
+          if (failed) {
+            markImageError(i);
+          } else if (url) {
+            showImage(i, url);
+          }
+        });
       }
-      tries++;
+    } catch (err) {
+      console.error('poll session:', err);
     }
-    if (!url) throw new Error('Timeout');
 
-    // Show
-    const img = document.getElementById('img' + idx);
-    img.onload = () => {
-      document.getElementById('loading' + idx).style.display = 'none';
-      img.style.display = 'block';
-      document.getElementById('ov' + idx).style.display = 'flex';
-    };
-    img.src = url;
+    const doneCount = Object.values(imageStatus).filter(s => s === 'done' || s === 'error').length;
+    if (doneCount >= total) {
+      clearTimeout(pollTimer);
+      maybeShowBookingCTA();
+      return;
+    }
+    if (tries >= MAX_TRIES) {
+      // Timeout: marca os pendentes como erro
+      for (let i = 0; i < total; i++) {
+        if (!imageStatus[i]) markImageError(i);
+      }
+      maybeShowBookingCTA();
+      return;
+    }
+    pollTimer = setTimeout(tick, 3000);
+  };
 
-  } catch(err) {
-    console.error('Imagem ' + idx + ':', err);
-    const el = document.getElementById('loading' + idx);
-    if (el) el.innerHTML = '<p style="color:#e07070;font-size:11px;padding:16px;text-align:center;line-height:1.5">Não foi possível<br>gerar a imagem</p>';
-  }
+  pollTimer = setTimeout(tick, 1500);
+}
+
+function showImage(idx, url) {
+  const img = document.getElementById('img' + idx);
+  if (!img) return;
+  imageStatus[idx] = 'done';
+  img.onload = () => {
+    const ld = document.getElementById('loading' + idx);
+    if (ld) ld.style.display = 'none';
+    img.style.display = 'block';
+    const ov = document.getElementById('ov' + idx);
+    if (ov) ov.style.display = 'flex';
+  };
+  img.src = url;
+}
+
+function markImageError(idx) {
+  imageStatus[idx] = 'error';
+  const el = document.getElementById('loading' + idx);
+  if (el) el.innerHTML = '<p style="color:#e07070;font-size:11px;padding:16px;text-align:center;line-height:1.5">Não foi possível<br>gerar a imagem</p>';
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── CTA AGENDAMENTO ──
+let ctaShown = false;
+function maybeShowBookingCTA() {
+  if (ctaShown) return;
+  ctaShown = true;
+  const el = document.getElementById('bookCta');
+  if (el) el.style.display = 'block';
+}
+
+function hideBookingCTA() {
+  const el = document.getElementById('bookCta');
+  if (el) el.style.display = 'none';
+}
+
+function openLeadModal() {
+  document.getElementById('leadError').textContent = '';
+  document.getElementById('leadForm').style.display = 'block';
+  document.getElementById('leadDone').style.display = 'none';
+  document.getElementById('leadModal').classList.add('active');
+  setTimeout(() => document.getElementById('leadName').focus(), 80);
+}
+
+function closeLeadModal() {
+  document.getElementById('leadModal').classList.remove('active');
+}
+
+function normalizePhone(raw) {
+  return (raw || '').replace(/\D+/g, '');
+}
+
+async function submitLead() {
+  const nameEl = document.getElementById('leadName');
+  const phoneEl = document.getElementById('leadPhone');
+  const err = document.getElementById('leadError');
+  const btn = document.getElementById('leadSubmit');
+  const name = nameEl.value.trim();
+  const phoneDigits = normalizePhone(phoneEl.value);
+
+  err.textContent = '';
+  if (name.length < 2) { err.textContent = 'Informe seu nome.'; return; }
+  if (phoneDigits.length < 10 || phoneDigits.length > 13) {
+    err.textContent = 'Informe um WhatsApp válido com DDD.'; return;
+  }
+  if (!sessionUuid) { err.textContent = 'Sessão expirada. Atualize a página.'; return; }
+
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (PUBLIC_TOKEN) headers['x-visagismo-token'] = PUBLIC_TOKEN;
+    const resp = await fetch(API_BASE + '/lead', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        sessionUuid,
+        name,
+        phone: phoneDigits,
+        utm
+      })
+    });
+    if (!resp.ok) {
+      let detail = '';
+      try { detail = (await resp.json()).error || ''; } catch (_) {}
+      throw new Error(detail || ('Falha ' + resp.status));
+    }
+    document.getElementById('leadForm').style.display = 'none';
+    document.getElementById('leadDone').style.display = 'block';
+    hideBookingCTA();
+  } catch (e) {
+    console.error(e);
+    err.textContent = 'Não foi possível enviar. ' + (e.message || '');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Confirmar';
+  }
+}
 
 // ── SHARE ──
 function shareWpp() {
@@ -527,13 +723,18 @@ function shareWpp() {
 
 // ── RESTART ──
 function restart() {
-  photoBase64 = null; analysisData = null;
+  photoBase64 = null; analysisData = null; sessionUuid = null;
+  Object.keys(imageStatus).forEach(k => delete imageStatus[k]);
+  if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+  ctaShown = false;
   document.getElementById('previewImg').src = '';
   document.getElementById('previewArea').style.display = 'none';
   document.getElementById('uploadSection').style.display = 'block';
   document.getElementById('results').classList.remove('active');
   document.getElementById('avoidBar').style.display = 'none';
   document.getElementById('cutsGrid').innerHTML = '';
+  document.getElementById('bookCta').style.display = 'none';
+  closeLeadModal();
   fileInput.value = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
